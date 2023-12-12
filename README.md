@@ -112,7 +112,6 @@ $ make c_down
 1. 작업자의 디바이스 powershell에서 아래와 같은 명령어를 입력합니다. (Windows)
 ```bash
 $ ssh -L 8000:localhost:8000 [host_name]@[host_address] -p [host_port]
-$ ssh -L 8000:localhost:8000 xaiplanet@211.115.91.39 -p 9238
 ```
 
 <br>
