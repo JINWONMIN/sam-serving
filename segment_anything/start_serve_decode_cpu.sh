@@ -1,0 +1,1 @@
+docker run -it --rm --name model-serving-decode -p 7080:7080 -p 7081:7081 -p 7082:7082 -v $(pwd)/model-store/:/home/model-server/volume/model-store/ sam-cpu:1.0.0 sh -c "cd /home/model-server && mkdir -p volume/tmp && torchserve --foreground --ts-config ./config.properties"

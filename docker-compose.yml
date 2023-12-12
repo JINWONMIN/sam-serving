@@ -1,0 +1,60 @@
+version: "2.3"
+
+services:
+  proxy:
+    container_name: proxy
+    image: labeling_ground/api_server:sam_proxy_1.0.0
+    restart: always
+    environment:
+      - PLATFORM=docker_compose
+      - CACHE_HOST=redis
+      - GPU_SERVICE_HOST=gpu
+      - CPU_SERVICE_HOST=cpu
+    ports:
+      - "8000:8000"
+    command: ./run.sh
+    depends_on:
+      - redis
+      - gpu
+      - cpu
+
+  gpu:
+    container_name: model-serving-encode
+    image: sam-gpu:1.0.0
+    restart: always
+    ports:
+      - "8080:8080"
+      - "8081:8081"
+      - "8082:8082"
+    runtime: nvidia
+    volumes:
+      - ./segment_anything/model-store/sam_vit_h_encode.mar:/home/model-server/volume/model-store/sam_vit_h_encode.mar
+    entrypoint: ["sh", "-c"]
+    command:
+      - |
+        cd /home/model-server && 
+        mkdir -p volume/tmp &&
+        torchserve --foreground --ts-config ./config.properties
+
+  cpu:
+    container_name: model-serving-decode
+    image: sam-cpu:1.0.0
+    restart: always
+    ports:
+      - "7080:7080"
+      - "7081:7081"
+      - "7082:7082"
+    volumes:
+      - ./segment_anything/model-store/:/home/model-server/volume/model-store/
+    entrypoint: ["sh", "-c"]
+    command:
+      - |
+        cd /home/model-server &&
+        mkdir -p volume/tmp &&
+        torchserve --foreground --ts-config ./config.properties
+
+  redis:
+    container_name: redis
+    image: "redis:latest"
+    ports:
+      - "6379:6379"

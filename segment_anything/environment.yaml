@@ -1,0 +1,26 @@
+name: segment-labeling
+channels:
+    - conda-forge
+dependencies:
+    - httpx
+    - ipykernel
+    - matplotlib
+    - gcc
+    - opencv
+    - onnx
+    - onnxruntime
+    - pandas
+    - pillow
+    - pip
+    - pystac-client
+    - rasterio
+    - scikit-image
+    - tensorboard
+    - cudatoolkit
+    - pytorch==2.0
+    - pytorch-lightning==2.0
+    - torchvision
+    - pip:
+        - git+https://github.com/facebookresearch/segment-anything.git
+        - pycocotools
+        - torch-model-archiver

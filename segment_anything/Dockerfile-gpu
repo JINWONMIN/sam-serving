@@ -1,0 +1,27 @@
+FROM pytorch/torchserve:latest-gpu
+
+USER root
+
+# Install required packages
+RUN apt update \
+    && apt install -y unzip git curl vim \
+    && curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" \
+    && unzip awscliv2.zip \
+    && ./aws/install
+
+# Install NVIDIA driver and related tools
+RUN pip install "onnxruntime==1.14.1" "onnx==1.13.1" "git+https://github.com/facebookresearch/segment-anything.git"
+
+# Copy configuration files
+COPY ./segment_anything/deployment/config_encode.properties /home/model-server/config.properties
+COPY ./segment_anything/deployment/append_memory_setting.sh /home/model-server/append_memory_setting.sh
+RUN chmod +x /home/model-server/append_memory_setting.sh \
+    && /home/model-server/append_memory_setting.sh
+
+COPY ./segment_anything/start ./
+
+WORKDIR /home/model-server
+ENV TEMP=/home/model-server/volume/tmp
+ENV ENABLE_TORCH_PROFILER=TRUE
+
+CMD ./start
